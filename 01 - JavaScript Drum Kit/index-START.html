@@ -59,6 +59,25 @@
 
 <script>
 
+function playSound(event){
+  const audio = document.querySelector(`audio[data-key="${event.keyCode}"]`);
+   const key = document.querySelector(`.key[data-key="${event.keyCode}"]`);
+   if(!audio || !key) return; //stops the function form running
+   audio.currentTime = 0; // rewinds audio to the start
+   audio.play();
+   key.classList.add('playing');
+  }
+
+window.addEventListener('keydown', playSound);
+
+function removeTransition(event) {
+  if(event.propertyName !== 'transform') return; // skip if it's not a transform
+  this.classList.remove('playing');
+}
+
+const keys = document.querySelectorAll('.key');
+keys.forEach(key => key.addEventListener('transitionend', removeTransition));
+
 </script>
 
 
