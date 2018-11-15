@@ -10,8 +10,78 @@
   </div>
 
 <script>
+  function debounce(func, wait = 20, immediate = true) {
+    var timeout;
+    return function() {
+      var context = this, args = arguments;
+      var later = function() {
+        timeout = null;
+        if (!immediate) func.apply(context, args);
+      };
+      var callNow = immediate && !timeout;
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+      if (callNow) func.apply(context, args);
+    };
+  }
+
   window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
+  const recognition = new SpeechRecognition();
+  recognition.interimResults = true;
+
+  let p = document.createElement('p');
+  const words = document.querySelector('.words');
+  words.appendChild(p);
+
+  recognition.addEventListener('result', debounce(e => {
+    const transcript = Array.from(e.results)
+    .map(result => result[0])
+    .map(result => result.transcript)
+    .join(' ');
+
+    p.textContent = transcript;
+    if(e.results[0].isFinal){
+      p= document.createElement('p');
+      words.appendChild(p);
+    }
+    if(transcript.includes('unicorn' || 'unicorns')){
+      p.textContent= '🦄';      
+    }
+    if(transcript.includes('get the weather')){
+      getWeather();
+    }
+
+    console.log(transcript);
+  }));
+
+  const getWeather = async() => {
+    const weatherData = await(await fetch("https://api.openweathermap.org/data/2.5/weather?zip=10026,us&units=imperial&appid=5e59338742b24aa8859bdb1e13458d46")).json();
+    cityTempF = Math.floor(weatherData.main.temp);
+    cityTempC = Math.floor((cityTempF - 32) * (5 / 9));
+    cityWeatherDescription = weatherData.weather[0].description;
+    let emoji = '';
+    if(cityWeatherDescription.includes('sun')){
+      emoji = '☀️';
+    }
+    if(cityWeatherDescription.includes('snow')){
+      emoji = '☃️';
+    }
+    if(cityWeatherDescription.includes('rain')){
+      emoji = '☔️';
+    }
+    if(cityWeatherDescription.includes('storm')){
+      emoji = '⛈';
+    }
+    if(cityWeatherDescription.includes('cloud')){
+      emoji = '🌥';
+    }
+    return p.textContent = `${cityTempF}F / ${cityTempC}C ${emoji} ${cityWeatherDescription}`;
+  }
+
+  recognition.addEventListener('end', recognition.start);
+  
+  recognition.start();
 
 </script>
 
