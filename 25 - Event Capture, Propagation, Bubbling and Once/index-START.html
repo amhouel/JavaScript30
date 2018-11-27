@@ -42,7 +42,22 @@
 
 <button></button>
 <script>
-
+  const divs = document.querySelectorAll('div');
+  const button = document.querySelector('button');
+  function logText(e) {
+    console.log(this.classList.value);
+    // e.stopPropagation(); //stop bubbling -> won't trigger events on the parent nodes anymore
+    // console.log(this); //capture goes from top to down and then the event bubbles up: click ripples all the way up
+  }
+  
+  divs.forEach(div => div.addEventListener('click', logText, {
+    capture: false, // we will run the function on the way up. If true the function will run on the way down.
+    once: true // listens for a click once and then unbinds itself (replaces removeEventListener)
+  }));
+  
+  button.addEventListener('click', () => console.log('click!!!'), {
+    once: true
+  });
 </script>
 </body>
 </html>
