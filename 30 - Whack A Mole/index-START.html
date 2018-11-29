@@ -31,14 +31,19 @@
       <div class="mole"></div>
     </div>
   </div>
+  <h1>Your Total Score is: <span class="total-score"></span></h1> 
 
 <script>
   const holes = document.querySelectorAll('.hole');
   const scoreBoard = document.querySelector('.score');
+  const totalScoreBoard = document.querySelector('.total-score');
   const moles = document.querySelectorAll('.mole');
   let lastHole;
   let timeUp = false;
   let score;
+  let totalScore = JSON.parse(localStorage.getItem('playerScore')) > 0 ? JSON.parse(localStorage.getItem('playerScore')) : 0;
+
+  totalScoreBoard.textContent = totalScore;
 
   function randomTime(min, max){
     return Math.round(Math.random() * (max - min) + min);
@@ -69,14 +74,20 @@
     timeUp = false;
     score = 0;
     peep();
-    setTimeout(() => timeUp = true, 10000);
+    setTimeout(() => {
+      timeUp = true;
+      localStorage.setItem('playerScore', JSON.stringify(totalScore));
+    }, 10000);
+    
   }
 
   function bonk(e){
     if(!e.isTrusted) return; //cheater - someone is faking a click
     score++;
+    totalScore ++;
     this.classList.remove('up');
     scoreBoard.textContent = score;
+    totalScoreBoard.textContent = totalScore;
   }
 
   moles.forEach(mole => mole.addEventListener('click', bonk));

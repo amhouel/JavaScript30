@@ -72,3 +72,8 @@ h1 {
 .start-button {
   cursor: pointer;
 }
+
+.total-score {
+  margin-top: 20px;
+  font-size: 10rem;
+}
